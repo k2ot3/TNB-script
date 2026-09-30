@@ -1,0 +1,1187 @@
+-- Combined Tools Menu (Compact + Better Tabs)
+-- Chat Spam + Drop Spam + Instant Interact + Spam Interact + ESP + Car Fly
+
+local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
+local UserInputService = game:GetService("UserInputService")
+local ProximityPromptService = game:GetService("ProximityPromptService")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local localPlayer = player
+
+-- Remove old UIs
+if playerGui:FindFirstChild("CombinedToolsUI") then
+	playerGui.CombinedToolsUI:Destroy()
+end
+if playerGui:FindFirstChild("ESPUI") then
+	playerGui.ESPUI:Destroy()
+end
+
+----------------------------------------------------------------
+-- CREATE UI
+----------------------------------------------------------------
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "CombinedToolsUI"
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.Parent = playerGui
+
+-- Main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 320, 0, 240)
+mainFrame.Position = UDim2.new(0.5, -160, 0.55, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(16, 16, 20)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Parent = screenGui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 12)
+mainCorner.Parent = mainFrame
+
+local mainStroke = Instance.new("UIStroke")
+mainStroke.Color = Color3.fromRGB(40, 40, 48)
+mainStroke.Thickness = 1
+mainStroke.Parent = mainFrame
+
+-- Top Bar
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 32)
+topBar.BackgroundColor3 = Color3.fromRGB(24, 24, 30)
+topBar.BorderSizePixel = 0
+topBar.Parent = mainFrame
+
+local topCorner = Instance.new("UICorner")
+topCorner.CornerRadius = UDim.new(0, 12)
+topCorner.Parent = topBar
+
+local topFix = Instance.new("Frame")
+topFix.Size = UDim2.new(1, 0, 0, 12)
+topFix.Position = UDim2.new(0, 0, 1, -12)
+topFix.BackgroundColor3 = Color3.fromRGB(24, 24, 30)
+topFix.BorderSizePixel = 0
+topFix.Parent = topBar
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -42, 1, 0)
+title.Position = UDim2.new(0, 12, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Tools Menu"
+title.TextColor3 = Color3.fromRGB(235, 235, 240)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 14
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = topBar
+
+-- Minimize Button
+local minBtn = Instance.new("TextButton")
+minBtn.Size = UDim2.new(0, 26, 0, 26)
+minBtn.Position = UDim2.new(1, -30, 0, 3)
+minBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
+minBtn.Text = "–"
+minBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minBtn.Font = Enum.Font.GothamBold
+minBtn.TextSize = 16
+minBtn.Parent = topBar
+
+local minCorner = Instance.new("UICorner")
+minCorner.CornerRadius = UDim.new(0, 6)
+minCorner.Parent = minBtn
+
+----------------------------------------------------------------
+-- TABS
+----------------------------------------------------------------
+local tabContainer = Instance.new("Frame")
+tabContainer.Size = UDim2.new(1, -12, 0, 28)
+tabContainer.Position = UDim2.new(0, 6, 0, 38)
+tabContainer.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+tabContainer.BorderSizePixel = 0
+tabContainer.Parent = mainFrame
+
+local tabContainerCorner = Instance.new("UICorner")
+tabContainerCorner.CornerRadius = UDim.new(0, 8)
+tabContainerCorner.Parent = tabContainer
+
+local tabLayout = Instance.new("UIListLayout")
+tabLayout.FillDirection = Enum.FillDirection.Horizontal
+tabLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+tabLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+tabLayout.Padding = UDim.new(0, 3)
+tabLayout.Parent = tabContainer
+
+local function createTab(text)
+	local btn = Instance.new("TextButton")
+	btn.Name = text .. "Tab"
+	btn.Size = UDim2.new(0.19, 0, 0, 22)
+	btn.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
+	btn.Text = text
+	btn.TextColor3 = Color3.fromRGB(160, 160, 170)
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 11
+	btn.AutoButtonColor = false
+	btn.Parent = tabContainer
+
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0, 6)
+	c.Parent = btn
+
+	return btn
+end
+
+local chatTab     = createTab("Chat")
+local dropTab     = createTab("Drop")
+local interactTab = createTab("Instant")
+local espTab      = createTab("ESP")
+local flyTab      = createTab("Fly")
+
+-- Content Area
+local content = Instance.new("Frame")
+content.Name = "Content"
+content.Size = UDim2.new(1, -12, 0, 162)
+content.Position = UDim2.new(0, 6, 0, 72)
+content.BackgroundTransparency = 1
+content.Parent = mainFrame
+
+----------------------------------------------------------------
+-- CHAT SPAM PAGE
+----------------------------------------------------------------
+local chatPage = Instance.new("Frame")
+chatPage.Size = UDim2.new(1, 0, 1, 0)
+chatPage.BackgroundTransparency = 1
+chatPage.Visible = true
+chatPage.Parent = content
+
+local chatBox = Instance.new("TextBox")
+chatBox.Size = UDim2.new(1, 0, 0, 32)
+chatBox.Position = UDim2.new(0, 0, 0, 4)
+chatBox.BackgroundColor3 = Color3.fromRGB(28, 28, 34)
+chatBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+chatBox.PlaceholderText = "Message to spam..."
+chatBox.PlaceholderColor3 = Color3.fromRGB(110, 110, 120)
+chatBox.Font = Enum.Font.Gotham
+chatBox.TextSize = 13
+chatBox.Text = ""
+chatBox.ClearTextOnFocus = false
+chatBox.Parent = chatPage
+
+local chatBoxCorner = Instance.new("UICorner")
+chatBoxCorner.CornerRadius = UDim.new(0, 7)
+chatBoxCorner.Parent = chatBox
+
+local chatStart = Instance.new("TextButton")
+chatStart.Size = UDim2.new(0.48, -3, 0, 32)
+chatStart.Position = UDim2.new(0, 0, 0, 44)
+chatStart.BackgroundColor3 = Color3.fromRGB(0, 145, 65)
+chatStart.Text = "Activate"
+chatStart.TextColor3 = Color3.new(1, 1, 1)
+chatStart.Font = Enum.Font.GothamBold
+chatStart.TextSize = 13
+chatStart.Parent = chatPage
+
+local chatStartCorner = Instance.new("UICorner")
+chatStartCorner.CornerRadius = UDim.new(0, 7)
+chatStartCorner.Parent = chatStart
+
+local chatStop = Instance.new("TextButton")
+chatStop.Size = UDim2.new(0.48, -3, 0, 32)
+chatStop.Position = UDim2.new(0.52, 3, 0, 44)
+chatStop.BackgroundColor3 = Color3.fromRGB(175, 35, 35)
+chatStop.Text = "Stop"
+chatStop.TextColor3 = Color3.new(1, 1, 1)
+chatStop.Font = Enum.Font.GothamBold
+chatStop.TextSize = 13
+chatStop.Parent = chatPage
+
+local chatStopCorner = Instance.new("UICorner")
+chatStopCorner.CornerRadius = UDim.new(0, 7)
+chatStopCorner.Parent = chatStop
+
+local chatStatus = Instance.new("TextLabel")
+chatStatus.Size = UDim2.new(1, 0, 0, 32)
+chatStatus.Position = UDim2.new(0, 0, 0, 88)
+chatStatus.BackgroundTransparency = 1
+chatStatus.Text = "Status: Idle"
+chatStatus.TextColor3 = Color3.fromRGB(140, 140, 150)
+chatStatus.Font = Enum.Font.Gotham
+chatStatus.TextSize = 12
+chatStatus.TextXAlignment = Enum.TextXAlignment.Left
+chatStatus.TextWrapped = true
+chatStatus.Parent = chatPage
+
+----------------------------------------------------------------
+-- DROP SPAM PAGE
+----------------------------------------------------------------
+local dropPage = Instance.new("Frame")
+dropPage.Size = UDim2.new(1, 0, 1, 0)
+dropPage.BackgroundTransparency = 1
+dropPage.Visible = false
+dropPage.Parent = content
+
+local dropInfo = Instance.new("TextLabel")
+dropInfo.Size = UDim2.new(1, 0, 0, 32)
+dropInfo.Position = UDim2.new(0, 0, 0, 4)
+dropInfo.BackgroundTransparency = 1
+dropInfo.Text = "Equips first tool then spams /drop"
+dropInfo.TextColor3 = Color3.fromRGB(140, 140, 150)
+dropInfo.Font = Enum.Font.Gotham
+dropInfo.TextSize = 12
+dropInfo.TextWrapped = true
+dropInfo.Parent = dropPage
+
+local dropStart = Instance.new("TextButton")
+dropStart.Size = UDim2.new(0.48, -3, 0, 34)
+dropStart.Position = UDim2.new(0, 0, 0, 44)
+dropStart.BackgroundColor3 = Color3.fromRGB(0, 145, 65)
+dropStart.Text = "START"
+dropStart.TextColor3 = Color3.new(1, 1, 1)
+dropStart.Font = Enum.Font.GothamBold
+dropStart.TextSize = 13
+dropStart.Parent = dropPage
+
+local dropStartCorner = Instance.new("UICorner")
+dropStartCorner.CornerRadius = UDim.new(0, 7)
+dropStartCorner.Parent = dropStart
+
+local dropStop = Instance.new("TextButton")
+dropStop.Size = UDim2.new(0.48, -3, 0, 34)
+dropStop.Position = UDim2.new(0.52, 3, 0, 44)
+dropStop.BackgroundColor3 = Color3.fromRGB(175, 35, 35)
+dropStop.Text = "STOP"
+dropStop.TextColor3 = Color3.new(1, 1, 1)
+dropStop.Font = Enum.Font.GothamBold
+dropStop.TextSize = 13
+dropStop.Parent = dropPage
+
+local dropStopCorner = Instance.new("UICorner")
+dropStopCorner.CornerRadius = UDim.new(0, 7)
+dropStopCorner.Parent = dropStop
+
+local dropStatus = Instance.new("TextLabel")
+dropStatus.Size = UDim2.new(1, 0, 0, 26)
+dropStatus.Position = UDim2.new(0, 0, 0, 90)
+dropStatus.BackgroundTransparency = 1
+dropStatus.Text = "Status: Idle"
+dropStatus.TextColor3 = Color3.fromRGB(140, 140, 150)
+dropStatus.Font = Enum.Font.Gotham
+dropStatus.TextSize = 12
+dropStatus.Parent = dropPage
+
+----------------------------------------------------------------
+-- INSTANT INTERACT PAGE
+----------------------------------------------------------------
+local interactPage = Instance.new("Frame")
+interactPage.Size = UDim2.new(1, 0, 1, 0)
+interactPage.BackgroundTransparency = 1
+interactPage.Visible = false
+interactPage.Parent = content
+
+local interactInfo = Instance.new("TextLabel")
+interactInfo.Size = UDim2.new(1, 0, 0, 30)
+interactInfo.Position = UDim2.new(0, 0, 0, 2)
+interactInfo.BackgroundTransparency = 1
+interactInfo.Text = "Instant = no hold  •  Spam = auto-trigger nearby"
+interactInfo.TextColor3 = Color3.fromRGB(140, 140, 150)
+interactInfo.Font = Enum.Font.Gotham
+interactInfo.TextSize = 11
+interactInfo.TextWrapped = true
+interactInfo.Parent = interactPage
+
+local interactToggle = Instance.new("TextButton")
+interactToggle.Size = UDim2.new(1, 0, 0, 32)
+interactToggle.Position = UDim2.new(0, 0, 0, 36)
+interactToggle.BackgroundColor3 = Color3.fromRGB(35, 155, 65)
+interactToggle.Text = "Instant: ON"
+interactToggle.TextColor3 = Color3.new(1, 1, 1)
+interactToggle.Font = Enum.Font.GothamBold
+interactToggle.TextSize = 13
+interactToggle.Parent = interactPage
+
+local interactCorner = Instance.new("UICorner")
+interactCorner.CornerRadius = UDim.new(0, 7)
+interactCorner.Parent = interactToggle
+
+local spamInteractBtn = Instance.new("TextButton")
+spamInteractBtn.Size = UDim2.new(1, 0, 0, 32)
+spamInteractBtn.Position = UDim2.new(0, 0, 0, 76)
+spamInteractBtn.BackgroundColor3 = Color3.fromRGB(175, 35, 35)
+spamInteractBtn.Text = "Spam Interact: OFF"
+spamInteractBtn.TextColor3 = Color3.new(1, 1, 1)
+spamInteractBtn.Font = Enum.Font.GothamBold
+spamInteractBtn.TextSize = 13
+spamInteractBtn.Parent = interactPage
+
+local spamInteractCorner = Instance.new("UICorner")
+spamInteractCorner.CornerRadius = UDim.new(0, 7)
+spamInteractCorner.Parent = spamInteractBtn
+
+local interactStatus = Instance.new("TextLabel")
+interactStatus.Size = UDim2.new(1, 0, 0, 24)
+interactStatus.Position = UDim2.new(0, 0, 0, 118)
+interactStatus.BackgroundTransparency = 1
+interactStatus.Text = "Status: Instant Enabled"
+interactStatus.TextColor3 = Color3.fromRGB(0, 210, 95)
+interactStatus.Font = Enum.Font.Gotham
+interactStatus.TextSize = 12
+interactStatus.Parent = interactPage
+
+----------------------------------------------------------------
+-- ESP PAGE
+----------------------------------------------------------------
+local espPage = Instance.new("Frame")
+espPage.Size = UDim2.new(1, 0, 1, 0)
+espPage.BackgroundTransparency = 1
+espPage.Visible = false
+espPage.Parent = content
+
+local espInfo = Instance.new("TextLabel")
+espInfo.Size = UDim2.new(1, 0, 0, 40)
+espInfo.Position = UDim2.new(0, 0, 0, 4)
+espInfo.BackgroundTransparency = 1
+espInfo.Text = "Players through walls + hotbar tools only + dropped tools"
+espInfo.TextColor3 = Color3.fromRGB(140, 140, 150)
+espInfo.Font = Enum.Font.Gotham
+espInfo.TextSize = 12
+espInfo.TextWrapped = true
+espInfo.Parent = espPage
+
+local espToggle = Instance.new("TextButton")
+espToggle.Size = UDim2.new(1, 0, 0, 38)
+espToggle.Position = UDim2.new(0, 0, 0, 50)
+espToggle.BackgroundColor3 = Color3.fromRGB(35, 155, 65)
+espToggle.Text = "ON"
+espToggle.TextColor3 = Color3.new(1, 1, 1)
+espToggle.Font = Enum.Font.GothamBold
+espToggle.TextSize = 14
+espToggle.Parent = espPage
+
+local espCorner = Instance.new("UICorner")
+espCorner.CornerRadius = UDim.new(0, 7)
+espCorner.Parent = espToggle
+
+local espStatus = Instance.new("TextLabel")
+espStatus.Size = UDim2.new(1, 0, 0, 24)
+espStatus.Position = UDim2.new(0, 0, 0, 100)
+espStatus.BackgroundTransparency = 1
+espStatus.Text = "Status: Enabled"
+espStatus.TextColor3 = Color3.fromRGB(0, 210, 95)
+espStatus.Font = Enum.Font.Gotham
+espStatus.TextSize = 12
+espStatus.Parent = espPage
+
+----------------------------------------------------------------
+-- FLY PAGE (NEW)
+----------------------------------------------------------------
+local flyPage = Instance.new("Frame")
+flyPage.Size = UDim2.new(1, 0, 1, 0)
+flyPage.BackgroundTransparency = 1
+flyPage.Visible = false
+flyPage.Parent = content
+
+local flyInfo = Instance.new("TextLabel")
+flyInfo.Size = UDim2.new(1, 0, 0, 28)
+flyInfo.Position = UDim2.new(0, 0, 0, 2)
+flyInfo.BackgroundTransparency = 1
+flyInfo.Text = "Sit in a car/vehicle then enable fly. WASD + Space/Ctrl"
+flyInfo.TextColor3 = Color3.fromRGB(140, 140, 150)
+flyInfo.Font = Enum.Font.Gotham
+flyInfo.TextSize = 11
+flyInfo.TextWrapped = true
+flyInfo.Parent = flyPage
+
+local flyToggle = Instance.new("TextButton")
+flyToggle.Size = UDim2.new(1, 0, 0, 34)
+flyToggle.Position = UDim2.new(0, 0, 0, 34)
+flyToggle.BackgroundColor3 = Color3.fromRGB(175, 35, 35)
+flyToggle.Text = "Car Fly: OFF"
+flyToggle.TextColor3 = Color3.new(1, 1, 1)
+flyToggle.Font = Enum.Font.GothamBold
+flyToggle.TextSize = 13
+flyToggle.Parent = flyPage
+
+local flyToggleCorner = Instance.new("UICorner")
+flyToggleCorner.CornerRadius = UDim.new(0, 7)
+flyToggleCorner.Parent = flyToggle
+
+local speedLabel = Instance.new("TextLabel")
+speedLabel.Size = UDim2.new(0.4, 0, 0, 28)
+speedLabel.Position = UDim2.new(0, 0, 0, 80)
+speedLabel.BackgroundTransparency = 1
+speedLabel.Text = "Speed:"
+speedLabel.TextColor3 = Color3.fromRGB(200, 200, 210)
+speedLabel.Font = Enum.Font.GothamBold
+speedLabel.TextSize = 13
+speedLabel.TextXAlignment = Enum.TextXAlignment.Left
+speedLabel.Parent = flyPage
+
+local speedBox = Instance.new("TextBox")
+speedBox.Size = UDim2.new(0.35, 0, 0, 28)
+speedBox.Position = UDim2.new(0.32, 0, 0, 80)
+speedBox.BackgroundColor3 = Color3.fromRGB(28, 28, 34)
+speedBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedBox.Text = "80"
+speedBox.Font = Enum.Font.GothamBold
+speedBox.TextSize = 14
+speedBox.ClearTextOnFocus = false
+speedBox.Parent = flyPage
+
+local speedBoxCorner = Instance.new("UICorner")
+speedBoxCorner.CornerRadius = UDim.new(0, 6)
+speedBoxCorner.Parent = speedBox
+
+local speedUp = Instance.new("TextButton")
+speedUp.Size = UDim2.new(0, 32, 0, 28)
+speedUp.Position = UDim2.new(0.70, 0, 0, 80)
+speedUp.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
+speedUp.Text = "+"
+speedUp.TextColor3 = Color3.new(1, 1, 1)
+speedUp.Font = Enum.Font.GothamBold
+speedUp.TextSize = 16
+speedUp.Parent = flyPage
+
+local speedUpCorner = Instance.new("UICorner")
+speedUpCorner.CornerRadius = UDim.new(0, 6)
+speedUpCorner.Parent = speedUp
+
+local speedDown = Instance.new("TextButton")
+speedDown.Size = UDim2.new(0, 32, 0, 28)
+speedDown.Position = UDim2.new(0.82, 0, 0, 80)
+speedDown.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
+speedDown.Text = "-"
+speedDown.TextColor3 = Color3.new(1, 1, 1)
+speedDown.Font = Enum.Font.GothamBold
+speedDown.TextSize = 16
+speedDown.Parent = flyPage
+
+local speedDownCorner = Instance.new("UICorner")
+speedDownCorner.CornerRadius = UDim.new(0, 6)
+speedDownCorner.Parent = speedDown
+
+local flyStatus = Instance.new("TextLabel")
+flyStatus.Size = UDim2.new(1, 0, 0, 24)
+flyStatus.Position = UDim2.new(0, 0, 0, 120)
+flyStatus.BackgroundTransparency = 1
+flyStatus.Text = "Status: Disabled"
+flyStatus.TextColor3 = Color3.fromRGB(255, 95, 95)
+flyStatus.Font = Enum.Font.Gotham
+flyStatus.TextSize = 12
+flyStatus.Parent = flyPage
+
+----------------------------------------------------------------
+-- TAB SWITCHING
+----------------------------------------------------------------
+local function switchTab(selected)
+	chatPage.Visible = (selected == "chat")
+	dropPage.Visible = (selected == "drop")
+	interactPage.Visible = (selected == "interact")
+	espPage.Visible = (selected == "esp")
+	flyPage.Visible = (selected == "fly")
+
+	local function styleTab(tab, active)
+		if active then
+			tab.BackgroundColor3 = Color3.fromRGB(0, 130, 60)
+			tab.TextColor3 = Color3.new(1, 1, 1)
+		else
+			tab.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
+			tab.TextColor3 = Color3.fromRGB(160, 160, 170)
+		end
+	end
+
+	styleTab(chatTab, selected == "chat")
+	styleTab(dropTab, selected == "drop")
+	styleTab(interactTab, selected == "interact")
+	styleTab(espTab, selected == "esp")
+	styleTab(flyTab, selected == "fly")
+end
+
+chatTab.MouseButton1Click:Connect(function() switchTab("chat") end)
+dropTab.MouseButton1Click:Connect(function() switchTab("drop") end)
+interactTab.MouseButton1Click:Connect(function() switchTab("interact") end)
+espTab.MouseButton1Click:Connect(function() switchTab("esp") end)
+flyTab.MouseButton1Click:Connect(function() switchTab("fly") end)
+
+----------------------------------------------------------------
+-- MINIMIZE
+----------------------------------------------------------------
+local isMinimized = false
+local originalSize = mainFrame.Size
+
+minBtn.MouseButton1Click:Connect(function()
+	isMinimized = not isMinimized
+	if isMinimized then
+		mainFrame.Size = UDim2.new(0, 150, 0, 32)
+		content.Visible = false
+		tabContainer.Visible = false
+		minBtn.Text = "+"
+		title.Text = "Tools"
+	else
+		mainFrame.Size = originalSize
+		content.Visible = true
+		tabContainer.Visible = true
+		minBtn.Text = "–"
+		title.Text = "Tools Menu"
+	end
+end)
+
+----------------------------------------------------------------
+-- DRAGGABLE
+----------------------------------------------------------------
+local dragging = false
+local dragStart, startPos
+
+topBar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = mainFrame.Position
+	end
+end)
+
+topBar.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = false
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+		local delta = input.Position - dragStart
+		mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+end)
+
+----------------------------------------------------------------
+-- CHAT SPAM LOGIC
+----------------------------------------------------------------
+local chatSpamming = false
+local chatCount = 0
+
+local function getChannel()
+	local channels = TextChatService:FindFirstChild("TextChannels")
+	if not channels then return nil end
+	return channels:FindFirstChild("RBXGeneral") or channels:GetChildren()[1]
+end
+
+local function startChatSpam()
+	if chatSpamming then return end
+	local msg = chatBox.Text
+	if msg == "" or msg:match("^%s*$") then
+		chatStatus.Text = "Status: Type a message first!"
+		chatStatus.TextColor3 = Color3.fromRGB(255, 85, 85)
+		return
+	end
+
+	local channel = getChannel()
+	if not channel then
+		chatStatus.Text = "Status: No chat channel found"
+		chatStatus.TextColor3 = Color3.fromRGB(255, 85, 85)
+		return
+	end
+
+	chatSpamming = true
+	chatCount = 0
+	chatStart.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+	chatStatus.Text = "Status: Spamming..."
+	chatStatus.TextColor3 = Color3.fromRGB(0, 240, 110)
+
+	task.spawn(function()
+		while chatSpamming do
+			pcall(function()
+				channel:SendAsync(msg)
+			end)
+			pcall(function()
+				local events = game:GetService("ReplicatedStorage"):FindFirstChild("DefaultChatSystemChatEvents")
+				if events and events:FindFirstChild("SayMessageRequest") then
+					events.SayMessageRequest:FireServer(msg, "All")
+				end
+			end)
+			chatCount += 1
+			chatStatus.Text = "Status: Spamming... Sent " .. chatCount .. " times"
+			task.wait(0.6)
+		end
+	end)
+end
+
+local function stopChatSpam()
+	chatSpamming = false
+	chatStart.BackgroundColor3 = Color3.fromRGB(0, 145, 65)
+	chatStatus.Text = "Status: Stopped after " .. chatCount .. " messages"
+	chatStatus.TextColor3 = Color3.fromRGB(255, 175, 45)
+end
+
+chatStart.MouseButton1Click:Connect(startChatSpam)
+chatStop.MouseButton1Click:Connect(stopChatSpam)
+
+----------------------------------------------------------------
+-- DROP SPAM LOGIC
+----------------------------------------------------------------
+local dropSpamming = false
+
+local function equipFirstTool()
+	local character = player.Character
+	if not character then return false end
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if not humanoid then return false end
+
+	local backpack = player:FindFirstChild("Backpack")
+	if backpack then
+		for _, item in ipairs(backpack:GetChildren()) do
+			if item:IsA("Tool") then
+				humanoid:EquipTool(item)
+				return true
+			end
+		end
+	end
+	for _, item in ipairs(character:GetChildren()) do
+		if item:IsA("Tool") then
+			return true
+		end
+	end
+	return false
+end
+
+local function startDropSpam()
+	if dropSpamming then return end
+	if not equipFirstTool() then
+		dropStatus.Text = "Status: No tool found!"
+		dropStatus.TextColor3 = Color3.fromRGB(255, 85, 85)
+		return
+	end
+
+	dropSpamming = true
+	dropStart.Text = "RUNNING"
+	dropStart.BackgroundColor3 = Color3.fromRGB(25, 90, 40)
+	dropStatus.Text = "Status: Drop spamming..."
+	dropStatus.TextColor3 = Color3.fromRGB(0, 240, 110)
+
+	task.spawn(function()
+		while dropSpamming do
+			pcall(function()
+				local channel = getChannel()
+				if channel then
+					channel:SendAsync("/drop")
+				end
+			end)
+			pcall(function()
+				local events = game:GetService("ReplicatedStorage"):FindFirstChild("DefaultChatSystemChatEvents")
+				if events and events:FindFirstChild("SayMessageRequest") then
+					events.SayMessageRequest:FireServer("/drop", "All")
+				end
+			end)
+			task.wait(0.15)
+		end
+	end)
+end
+
+local function stopDropSpam()
+	dropSpamming = false
+	dropStart.Text = "START"
+	dropStart.BackgroundColor3 = Color3.fromRGB(0, 145, 65)
+	dropStatus.Text = "Status: Stopped"
+	dropStatus.TextColor3 = Color3.fromRGB(255, 175, 45)
+end
+
+dropStart.MouseButton1Click:Connect(startDropSpam)
+dropStop.MouseButton1Click:Connect(stopDropSpam)
+
+----------------------------------------------------------------
+-- INSTANT INTERACT + SPAM INTERACT LOGIC
+----------------------------------------------------------------
+local instantEnabled = true
+local spamInteractEnabled = false
+
+local function makeInstant(prompt)
+	if prompt:IsA("ProximityPrompt") then
+		prompt.HoldDuration = 0
+		prompt.RequiresLineOfSight = false
+		if prompt.MaxActivationDistance < 15 then
+			prompt.MaxActivationDistance = 15
+		end
+	end
+end
+
+local function applyToAll()
+	for _, obj in ipairs(workspace:GetDescendants()) do
+		makeInstant(obj)
+	end
+end
+
+workspace.DescendantAdded:Connect(function(obj)
+	if instantEnabled then
+		makeInstant(obj)
+	end
+end)
+
+ProximityPromptService.PromptShown:Connect(function(prompt)
+	if instantEnabled then
+		makeInstant(prompt)
+	end
+end)
+
+local function updateInteractStatus()
+	local status = {}
+	if instantEnabled then
+		table.insert(status, "Instant ON")
+	else
+		table.insert(status, "Instant OFF")
+	end
+	if spamInteractEnabled then
+		table.insert(status, "Spam Interact ON")
+	else
+		table.insert(status, "Spam Interact OFF")
+	end
+	interactStatus.Text = "Status: " .. table.concat(status, "  |  ")
+	interactStatus.TextColor3 = (instantEnabled or spamInteractEnabled) and Color3.fromRGB(0, 210, 95) or Color3.fromRGB(255, 95, 95)
+end
+
+local function setInstant(state)
+	instantEnabled = state
+	if instantEnabled then
+		interactToggle.Text = "Instant: ON"
+		interactToggle.BackgroundColor3 = Color3.fromRGB(35, 155, 65)
+		applyToAll()
+	else
+		interactToggle.Text = "Instant: OFF"
+		interactToggle.BackgroundColor3 = Color3.fromRGB(165, 35, 35)
+	end
+	updateInteractStatus()
+end
+
+local function spamNearbyPrompts()
+	local character = player.Character
+	if not character then return end
+	local root = character:FindFirstChild("HumanoidRootPart")
+	if not root then return end
+
+	for _, obj in ipairs(workspace:GetDescendants()) do
+		if obj:IsA("ProximityPrompt") and obj.Enabled then
+			local parent = obj.Parent
+			local part = parent:IsA("BasePart") and parent or parent:FindFirstChildWhichIsA("BasePart")
+			if part then
+				local distance = (part.Position - root.Position).Magnitude
+				if distance <= (obj.MaxActivationDistance + 5) then
+					pcall(function()
+						obj:InputHoldBegin()
+						task.wait(0.03)
+						obj:InputHoldEnd()
+					end)
+				end
+			end
+		end
+	end
+end
+
+local function setSpamInteract(state)
+	spamInteractEnabled = state
+	if spamInteractEnabled then
+		spamInteractBtn.Text = "Spam Interact: ON"
+		spamInteractBtn.BackgroundColor3 = Color3.fromRGB(35, 155, 65)
+	else
+		spamInteractBtn.Text = "Spam Interact: OFF"
+		spamInteractBtn.BackgroundColor3 = Color3.fromRGB(175, 35, 35)
+	end
+	updateInteractStatus()
+end
+
+interactToggle.MouseButton1Click:Connect(function()
+	setInstant(not instantEnabled)
+end)
+
+spamInteractBtn.MouseButton1Click:Connect(function()
+	setSpamInteract(not spamInteractEnabled)
+end)
+
+task.spawn(function()
+	while true do
+		if instantEnabled then
+			applyToAll()
+		end
+		task.wait(2)
+	end
+end)
+
+task.spawn(function()
+	while true do
+		if spamInteractEnabled then
+			spamNearbyPrompts()
+		end
+		task.wait(0.12)
+	end
+end)
+
+setInstant(true)
+setSpamInteract(false)
+
+----------------------------------------------------------------
+-- ESP LOGIC (Hotbar only)
+----------------------------------------------------------------
+local ESP_ENABLED = true
+local MAX_DISTANCE = 2000
+local PLAYER_COLOR = Color3.fromRGB(0, 255, 100)
+local ENEMY_COLOR = Color3.fromRGB(255, 60, 60)
+local DROPPED_COLOR = Color3.fromRGB(255, 200, 50)
+
+local playerESP = {}
+local droppedESP = {}
+
+local function createBillboard(adornee, text, color, size)
+	local billboard = Instance.new("BillboardGui")
+	billboard.Name = "ESP_Billboard"
+	billboard.Adornee = adornee
+	billboard.Size = size or UDim2.new(0, 200, 0, 50)
+	billboard.StudsOffset = Vector3.new(0, 3, 0)
+	billboard.AlwaysOnTop = true
+	billboard.MaxDistance = MAX_DISTANCE
+
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1, 0, 1, 0)
+	label.BackgroundTransparency = 1
+	label.Text = text
+	label.TextColor3 = color or Color3.fromRGB(255, 255, 255)
+	label.TextStrokeTransparency = 0.3
+	label.TextStrokeColor3 = Color3.new(0, 0, 0)
+	label.Font = Enum.Font.GothamBold
+	label.TextSize = 14
+	label.Parent = billboard
+
+	billboard.Parent = adornee
+	return billboard, label
+end
+
+local function removePlayerESP(plr)
+	if playerESP[plr] then
+		for _, obj in pairs(playerESP[plr]) do
+			if typeof(obj) == "Instance" then
+				obj:Destroy()
+			end
+		end
+		playerESP[plr] = nil
+	end
+end
+
+local function updatePlayerESP(plr)
+	if plr == localPlayer then return end
+
+	local character = plr.Character
+	if not character then
+		removePlayerESP(plr)
+		return
+	end
+
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	local root = character:FindFirstChild("HumanoidRootPart") or character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+	if not humanoid or not root or humanoid.Health <= 0 then
+		removePlayerESP(plr)
+		return
+	end
+
+	if not playerESP[plr] then
+		playerESP[plr] = {}
+
+		local highlight = Instance.new("Highlight")
+		highlight.Name = "ESP_Highlight"
+		highlight.Adornee = character
+		highlight.FillColor = ENEMY_COLOR
+		highlight.OutlineColor = Color3.new(1, 1, 1)
+		highlight.FillTransparency = 0.7
+		highlight.OutlineTransparency = 0
+		highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+		highlight.Parent = character
+		playerESP[plr].highlight = highlight
+
+		local billboard, label = createBillboard(root, "", PLAYER_COLOR, UDim2.new(0, 220, 0, 60))
+		playerESP[plr].billboard = billboard
+		playerESP[plr].label = label
+	end
+
+	local myRoot = localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart")
+	local distance = myRoot and math.floor((root.Position - myRoot.Position).Magnitude) or 0
+
+	-- Equipped tool
+	local equipped = "None"
+	for _, item in ipairs(character:GetChildren()) do
+		if item:IsA("Tool") then
+			equipped = item.Name
+			break
+		end
+	end
+
+	-- Hotbar only (first 9 tools in Backpack)
+	local hotbarItems = {}
+	local backpack = plr:FindFirstChild("Backpack")
+	if backpack then
+		local count = 0
+		for _, item in ipairs(backpack:GetChildren()) do
+			if item:IsA("Tool") then
+				count += 1
+				if count <= 9 then
+					table.insert(hotbarItems, item.Name)
+				end
+			end
+		end
+	end
+
+	local invText = equipped
+	if #hotbarItems > 0 then
+		invText = equipped .. " | HB: " .. table.concat(hotbarItems, ", ")
+	end
+
+	playerESP[plr].label.Text = string.format(
+		"%s  [%dm]\nHP: %d/%d\nHolding: %s",
+		plr.Name,
+		distance,
+		math.floor(humanoid.Health),
+		math.floor(humanoid.MaxHealth),
+		invText
+	)
+
+	if plr.Team and localPlayer.Team and plr.Team == localPlayer.Team then
+		playerESP[plr].highlight.FillColor = Color3.fromRGB(0, 200, 255)
+	else
+		playerESP[plr].highlight.FillColor = ENEMY_COLOR
+	end
+end
+
+local function isDroppedTool(obj)
+	if not obj:IsA("Tool") then return false end
+	local parent = obj.Parent
+	if not parent then return false end
+	if parent:IsA("Model") and parent:FindFirstChildOfClass("Humanoid") then return false end
+	if parent.Name == "Backpack" then return false end
+	if parent:IsA("Player") then return false end
+	return true
+end
+
+local function updateDroppedESP()
+	for tool, data in pairs(droppedESP) do
+		if not tool or not tool.Parent or not isDroppedTool(tool) then
+			if data.billboard then data.billboard:Destroy() end
+			droppedESP[tool] = nil
+		end
+	end
+
+	for _, obj in ipairs(workspace:GetDescendants()) do
+		if isDroppedTool(obj) and not droppedESP[obj] then
+			local handle = obj:FindFirstChild("Handle") or obj:FindFirstChildWhichIsA("BasePart")
+			if handle then
+				local billboard, label = createBillboard(handle, "📦 " .. obj.Name, DROPPED_COLOR, UDim2.new(0, 150, 0, 30))
+				billboard.StudsOffset = Vector3.new(0, 1.5, 0)
+				droppedESP[obj] = {billboard = billboard, label = label}
+			end
+		end
+	end
+end
+
+local function clearAllESP()
+	for plr, _ in pairs(playerESP) do
+		removePlayerESP(plr)
+	end
+	for tool, data in pairs(droppedESP) do
+		if data.billboard then data.billboard:Destroy() end
+	end
+	droppedESP = {}
+end
+
+local function setESP(state)
+	ESP_ENABLED = state
+	if ESP_ENABLED then
+		espToggle.Text = "ON"
+		espToggle.BackgroundColor3 = Color3.fromRGB(35, 155, 65)
+		espStatus.Text = "Status: Enabled"
+		espStatus.TextColor3 = Color3.fromRGB(0, 210, 95)
+	else
+		espToggle.Text = "OFF"
+		espToggle.BackgroundColor3 = Color3.fromRGB(165, 35, 35)
+		espStatus.Text = "Status: Disabled"
+		espStatus.TextColor3 = Color3.fromRGB(255, 95, 95)
+		clearAllESP()
+	end
+end
+
+espToggle.MouseButton1Click:Connect(function()
+	setESP(not ESP_ENABLED)
+end)
+
+RunService.RenderStepped:Connect(function()
+	if not ESP_ENABLED then return end
+	for _, plr in ipairs(Players:GetPlayers()) do
+		updatePlayerESP(plr)
+	end
+	updateDroppedESP()
+end)
+
+Players.PlayerRemoving:Connect(function(plr)
+	removePlayerESP(plr)
+end)
+
+setESP(true)
+
+----------------------------------------------------------------
+-- CAR FLY LOGIC
+----------------------------------------------------------------
+local flyEnabled = false
+local flySpeed = 80
+local bodyVelocity = nil
+local bodyGyro = nil
+local flyConnection = nil
+
+local function getVehicle()
+	local character = player.Character
+	if not character then return nil end
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if not humanoid then return nil end
+
+	local seat = humanoid.SeatPart
+	if seat and (seat:IsA("VehicleSeat") or seat:IsA("Seat")) then
+		return seat.Parent
+	end
+	return nil
+end
+
+local function stopFly()
+	flyEnabled = false
+	if flyConnection then
+		flyConnection:Disconnect()
+		flyConnection = nil
+	end
+	if bodyVelocity then
+		bodyVelocity:Destroy()
+		bodyVelocity = nil
+	end
+	if bodyGyro then
+		bodyGyro:Destroy()
+		bodyGyro = nil
+	end
+	flyToggle.Text = "Car Fly: OFF"
+	flyToggle.BackgroundColor3 = Color3.fromRGB(175, 35, 35)
+	flyStatus.Text = "Status: Disabled"
+	flyStatus.TextColor3 = Color3.fromRGB(255, 95, 95)
+end
+
+local function startFly()
+	local vehicle = getVehicle()
+	if not vehicle then
+		flyStatus.Text = "Status: Sit in a vehicle first!"
+		flyStatus.TextColor3 = Color3.fromRGB(255, 85, 85)
+		return
+	end
+
+	local primary = vehicle.PrimaryPart or vehicle:FindFirstChildWhichIsA("BasePart")
+	if not primary then
+		flyStatus.Text = "Status: No primary part found"
+		flyStatus.TextColor3 = Color3.fromRGB(255, 85, 85)
+		return
+	end
+
+	-- Clean previous
+	if bodyVelocity then bodyVelocity:Destroy() end
+	if bodyGyro then bodyGyro:Destroy() end
+
+	bodyVelocity = Instance.new("BodyVelocity")
+	bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+	bodyVelocity.Velocity = Vector3.zero
+	bodyVelocity.Parent = primary
+
+	bodyGyro = Instance.new("BodyGyro")
+	bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+	bodyGyro.P = 10000
+	bodyGyro.D = 500
+	bodyGyro.Parent = primary
+
+	flyEnabled = true
+	flyToggle.Text = "Car Fly: ON"
+	flyToggle.BackgroundColor3 = Color3.fromRGB(35, 155, 65)
+	flyStatus.Text = "Status: Flying (Speed: " .. flySpeed .. ")"
+	flyStatus.TextColor3 = Color3.fromRGB(0, 210, 95)
+
+	if flyConnection then flyConnection:Disconnect() end
+	flyConnection = RunService.Heartbeat:Connect(function()
+		if not flyEnabled or not bodyVelocity or not bodyGyro then return end
+
+		local cam = workspace.CurrentCamera
+		local moveDir = Vector3.zero
+
+		if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+			moveDir = moveDir + cam.CFrame.LookVector
+		end
+		if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+			moveDir = moveDir - cam.CFrame.LookVector
+		end
+		if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+			moveDir = moveDir - cam.CFrame.RightVector
+		end
+		if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+			moveDir = moveDir + cam.CFrame.RightVector
+		end
+		if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+			moveDir = moveDir + Vector3.new(0, 1, 0)
+		end
+		if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.C) then
+			moveDir = moveDir - Vector3.new(0, 1, 0)
+		end
+
+		if moveDir.Magnitude > 0 then
+			moveDir = moveDir.Unit * flySpeed
+		end
+
+		bodyVelocity.Velocity = moveDir
+		bodyGyro.CFrame = cam.CFrame
+	end)
+end
+
+flyToggle.MouseButton1Click:Connect(function()
+	if flyEnabled then
+		stopFly()
+	else
+		startFly()
+	end
+end)
+
+local function updateSpeed(newSpeed)
+	flySpeed = math.clamp(tonumber(newSpeed) or 80, 10, 500)
+	speedBox.Text = tostring(flySpeed)
+	if flyEnabled then
+		flyStatus.Text = "Status: Flying (Speed: " .. flySpeed .. ")"
+	end
+end
+
+speedBox.FocusLost:Connect(function()
+	updateSpeed(speedBox.Text)
+end)
+
+speedUp.MouseButton1Click:Connect(function()
+	updateSpeed(flySpeed + 10)
+end)
+
+speedDown.MouseButton1Click:Connect(function()
+	updateSpeed(flySpeed - 10)
+end)
+
+-- Auto stop if player leaves seat
+RunService.Heartbeat:Connect(function()
+	if flyEnabled then
+		local vehicle = getVehicle()
+		if not vehicle then
+			stopFly()
+		end
+	end
+end)
+
+----------------------------------------------------------------
+-- HOTKEYS
+----------------------------------------------------------------
+UserInputService.InputBegan:Connect(function(input, gp)
+	if gp then return end
+	if input.KeyCode == Enum.KeyCode.RightControl then
+		setInstant(not instantEnabled)
+	elseif input.KeyCode == Enum.KeyCode.RightShift then
+		stopChatSpam()
+		stopDropSpam()
+	elseif input.KeyCode == Enum.KeyCode.RightAlt then
+		setESP(not ESP_ENABLED)
+	end
+end)
+
+print("Combined Tools Menu loaded! (Compact + Fly)")
